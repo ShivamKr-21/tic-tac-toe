@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic-Tac-Toe - Modern Web Game</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="game-container">
+    <header class="game-header">
+      <h1 class="game-title">
+        <span class="x-accent">TIC</span>
+        <span class="divider">•</span>
+        <span class="o-accent">TAC</span>
+        <span class="divider">•</span>
+        <span class="toe-accent">TOE</span>
+      </h1>
+      <p class="subtitle">Classic strategy with intelligent AI & 2-player mode</p>
+    </header>
+
+    <!-- Controls & Settings -->
+    <div class="controls-panel">
+      <!-- Mode Selection -->
+      <div class="control-group">
+        <label class="control-label" for="mode-select">Game Mode</label>
+        <div class="segmented-control" id="mode-control">
+          <button type="button" class="segment-btn active" data-mode="ai">Vs Computer</button>
+          <button type="button" class="segment-btn" data-mode="pvp">2 Players</button>
+        </div>
+      </div>
+
+      <!-- Difficulty Selection (AI Mode Only) -->
+      <div class="control-group" id="difficulty-group">
+        <label class="control-label" for="difficulty-select">AI Difficulty</label>
+        <div class="segmented-control" id="difficulty-control">
+          <button type="button" class="segment-btn" data-difficulty="easy">Easy</button>
+          <button type="button" class="segment-btn" data-difficulty="medium">Medium</button>
+          <button type="button" class="segment-btn active" data-difficulty="hard">Unbeatable</button>
+        </div>
+      </div>
+
+      <!-- Player Symbol Selection (AI Mode Only) -->
+      <div class="control-group" id="symbol-group">
+        <label class="control-label">Play As</label>
+        <div class="segmented-control" id="symbol-control">
+          <button type="button" class="segment-btn active" data-symbol="X">X (First)</button>
+          <button type="button" class="segment-btn" data-symbol="O">O (Second)</button>
+        </div>
+      </div>
+
+      <!-- Sound Toggle -->
+      <div class="control-group sound-toggle-group">
+        <button id="sound-btn" class="icon-btn" title="Toggle Sound (Mute/Unmute)" aria-label="Toggle Sound">
+          <svg class="sound-icon sound-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+          <svg class="sound-icon sound-off hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Scoreboard -->
+    <div class="scoreboard">
+      <div class="score-card player-x-card" id="card-x">
+        <span class="card-symbol x-mark">X</span>
+        <span class="card-label" id="label-x">Player X</span>
+        <span class="score-value" id="score-x">0</span>
+      </div>
+
+      <div class="score-card ties-card" id="card-ties">
+        <span class="card-symbol tie-mark">=</span>
+        <span class="card-label">Ties</span>
+        <span class="score-value" id="score-ties">0</span>
+      </div>
+
+      <div class="score-card player-o-card" id="card-o">
+        <span class="card-symbol o-mark">O</span>
+        <span class="card-label" id="label-o">Computer (AI)</span>
+        <span class="score-value" id="score-o">0</span>
+      </div>
+    </div>
+
+    <!-- Status Banner -->
+    <div class="status-banner" id="status-banner" aria-live="polite">
+      <span class="status-indicator" id="status-indicator"></span>
+      <span class="status-text" id="status-text">Your turn (X)</span>
+    </div>
+
+    <!-- Board -->
+    <div class="board-wrapper">
+      <div class="board" id="board" role="grid" aria-label="Tic-Tac-Toe Board">
+        <button class="cell" data-index="0" role="gridcell" aria-label="Row 1, Column 1"></button>
+        <button class="cell" data-index="1" role="gridcell" aria-label="Row 1, Column 2"></button>
+        <button class="cell" data-index="2" role="gridcell" aria-label="Row 1, Column 3"></button>
+        <button class="cell" data-index="3" role="gridcell" aria-label="Row 2, Column 1"></button>
+        <button class="cell" data-index="4" role="gridcell" aria-label="Row 2, Column 2"></button>
+        <button class="cell" data-index="5" role="gridcell" aria-label="Row 2, Column 3"></button>
+        <button class="cell" data-index="6" role="gridcell" aria-label="Row 3, Column 1"></button>
+        <button class="cell" data-index="7" role="gridcell" aria-label="Row 3, Column 2"></button>
+        <button class="cell" data-index="8" role="gridcell" aria-label="Row 3, Column 3"></button>
+      </div>
+      <!-- SVG Strike-through line for wins -->
+      <svg class="win-line-svg" id="win-line-svg" viewBox="0 0 300 300">
+        <line id="win-line" x1="0" y1="0" x2="0" y2="0" stroke="url(#win-gradient)" stroke-width="8" stroke-linecap="round"/>
+        <defs>
+          <linearGradient id="win-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#38bdf8" />
+            <stop offset="100%" stop-color="#f43f5e" />
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button id="restart-btn" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="btn-icon">
+          <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+        </svg>
+        New Round
+      </button>
+      <button id="reset-scores-btn" class="btn btn-secondary">
+        Reset Scoreboard
+      </button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
